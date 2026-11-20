@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Este proyecto desarrolla la resolución de problemas de programación entera mediante el lenguaje R y la librería `lpSolve`.
+Este proyecto desarrolla la resolución de problemas de programación entera mediante el lenguaje R y la librería `lpSolve`, usando el método **branch and bound** e imprimiendo el procedimiento completo.
 
 El programa permite formular problemas de optimización a partir de variables de decisión, una función objetivo y un conjunto de restricciones. Posteriormente, utiliza un solver para obtener la solución óptima del modelo, respetando las condiciones establecidas.
 
