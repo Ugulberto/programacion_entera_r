@@ -113,21 +113,42 @@ resolver_programacion_entera <- function(tipo_optimizacion, coeficientes, A, des
 }
 
 type <- "max"
-coef <- c(11.46,13.66,14.3,12.38,14.76,11.74,-18.5,-11.2,-10.3,-5,-5.1)
-A <- rbind(c(1,rep(0,10)),
-           c(0,1,rep(0,9)),
-           c(0,0,1,rep(0,8)),
-           c(0,0,0,1,rep(0,7)),
-           c(0,0,0,0,1,rep(0,6)),
-           c(0,0,0,0,0,1,rep(0,5)),
-           c((rep(1,6)),rep(0,5)),
-           c(0,-1,rep(0,4),29,rep(0,4)),
-           c(0,0,-1,0,0,0,0,29,0,0,0),
-           c(0,0,0,-1,0,0,0,0,29,0,0),
-           c(0,0,0,0,-1,0,0,0,0,29,0),
-           c(0,0,0,0,0,-1,0,0,0,0,29))
-b <- c(35,30,40,50,35,25,180,0,0,0,0,0)
-dir <- c("<=","<=","<=","<=","<=","<=","=",">=",">=",">=",">=",">=")
+coef <- c(11.46, 13.66, 14.3, 12.38, 14.76, 11.74, # Beneficio por vender una caja en el pueblo i
+          -9.46, -14.77, -4.06, -2.81, -6.29,      # Coste de realizar la ruta r una vez
+          0, 0, 0, 0, 0, 0, 0)                     # q_ir (qA1, qA2, qB2, qC3, qD4, qD5, qE5), no aportan beneficio directo
+
+A <- rbind(
+  c(1,0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el origen O (<= 35)
+  c(0,1,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el pueblo A (<= 30)
+  c(0,0,1,0,0,0,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el pueblo B (<= 40)
+  c(0,0,0,1,0,0,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el pueblo C (<= 50)
+  c(0,0,0,0,1,0,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el pueblo D (<= 35)
+  c(0,0,0,0,0,1,  0,0,0,0,0,  0,0,0,0,0,0,0), # Límite de cajas en el pueblo E (<= 25)
+  
+  c(1,1,1,1,1,1,  0,0,0,0,0,  0,0,0,0,0,0,0), # Se deben vender las 180 cajas en total
+  
+  c(0,0,0,0,0,0, -29,0,0,0,0,  1,0,0,0,0,0,0), # Capacidad de la ruta 1 (qA1 - 29*y1 <= 0)
+  c(0,0,0,0,0,0,  0,-29,0,0,0, 0,1,1,0,0,0,0), # Capacidad de la ruta 2 (qA2 + qB2 - 29*y2 <= 0)
+  c(0,0,0,0,0,0,  0,0,-29,0,0, 0,0,0,1,0,0,0), # Capacidad de la ruta 3 (qC3 - 29*y3 <= 0)
+  c(0,0,0,0,0,0,  0,0,0,-29,0, 0,0,0,0,1,0,0), # Capacidad de la ruta 4 (qD4 - 29*y4 <= 0)
+  c(0,0,0,0,0,0,  0,0,0,0,-29, 0,0,0,0,0,1,1), # Capacidad de la ruta 5 (qD5 + qE5 - 29*y5 <= 0)
+  
+  c(0,-1,0,0,0,0, 0,0,0,0,0,  1,1,0,0,0,0,0), # Cajas vendidas en A mediante rutas 1 y 2 (qA1 + qA2 - xA = 0)
+  c(0,0,-1,0,0,0, 0,0,0,0,0,  0,0,1,0,0,0,0), # Cajas vendidas en B mediante ruta 2 (qB2 - xB = 0)
+  c(0,0,0,-1,0,0, 0,0,0,0,0,  0,0,0,1,0,0,0), # Cajas vendidas en C mediante ruta 3 (qC3 - xC = 0)
+  c(0,0,0,0,-1,0, 0,0,0,0,0,  0,0,0,0,1,1,0), # Cajas vendidas en D mediante rutas 4 y 5 (qD4 + qD5 - xD = 0)
+  c(0,0,0,0,0,-1, 0,0,0,0,0,  0,0,0,0,0,0,1)  # Cajas vendidas en E mediante ruta 5 (qE5 - xE = 0)
+)
+
+b <- c(35, 30, 40, 50, 35, 25, # Límites de almacén
+       180,                    # Total de cajas
+       0, 0, 0, 0, 0,          # Capacidad de las 5 rutas
+       0, 0, 0, 0, 0)          # Enlace q_ir - x_i = 0
+
+dir <- c("<=", "<=", "<=", "<=", "<=", "<=",
+         "=",
+         "<=", "<=", "<=", "<=", "<=",
+         "=", "=", "=", "=", "=")
 
 resolver_programacion_entera(type, coef, A, dir, b)
 
